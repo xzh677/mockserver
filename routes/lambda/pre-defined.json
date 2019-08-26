@@ -1,0 +1,4 @@
+{
+  "echo":  "res.json({\n    'method': req.method,\n    'path': req.path,\n    'headers': req.headers,\n    'query': req.query,\n    'body': req.body\n  })",
+  "error500":"res.status(500).json({\n    'method': req.method,\n    'path': req.path,\n    'headers': req.headers,\n    'query': req.query,\n    'body': req.body\n  })"
+}

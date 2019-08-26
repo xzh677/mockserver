@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Function list</title>
+  <style>
+    :root {
+      --container-padding: 20px
+    }
+    .container {
+      padding: var(--container-padding)
+    }
+    #search {
+      /* Firefox */
+      width: -moz-calc(100% - 3 * var(--container-padding));
+      /* WebKit */
+      width: -webkit-calc(100% - 3 * var(--container-padding));
+      /* Opera */
+      width: -o-calc(100% - 3 * var(--container-padding));
+      /* Standard */
+      width: calc(100% - 3 * var(--container-padding));
+      /* Full-width */
+      font-size: 16px;
+      /* Increase font-size */
+      padding: 12px 20px 12px 40px;
+      /* Add some padding */
+      border: 1px solid #ddd;
+      /* Add a grey border */
+      margin-bottom: 12px;
+      /* Add some space below the input */
+    }
+
+    #addbox {
+      width: 50%;
+      /* Full-width */
+      font-size: 16px;
+      /* Increase font-size */
+      padding: 12px 20px 12px 40px;
+      /* Add some padding */
+      border: 1px solid #ddd;
+      /* Add a grey border */
+      margin-bottom: 12px;
+      /* Add some space below the input */
+    }
+
+    #addbutton {
+      font-size: 16px;
+      padding: 12px 40px 12px 40px;
+      color: #000;
+      background-color: rgb(139, 233, 195);
+      border: 1px solid #2EE59D;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+
+    #addbutton:hover {
+      background-color: #2EE59D;
+      color: #fff;
+    }
+
+    #table {
+      border-collapse: collapse;
+      /* Collapse borders */
+      width: 100%;
+      /* Full-width */
+      border: 1px solid #ddd;
+      /* Add a grey border */
+      font-size: 18px;
+      /* Increase font-size */
+    }
+
+    #table th,
+    #table td {
+      text-align: left;
+      /* Left-align text */
+      padding: 12px;
+      /* Add padding */
+    }
+
+    #table tr {
+      /* Add a bottom border to all table rows */
+      border-bottom: 1px solid #ddd;
+    }
+
+    #table tr.header,
+    #table tr:hover {
+      /* Add a grey background color to the table header and on hover */
+      background-color: #f1f1f1;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>Function list</h1>
+    <p>Execute your function with:</p>
+    <div>
+      <h4>GET</h4>
+      <pre>
+          curl http://{hostname}/lambda/execute/{functionName}
+      </pre>
+      <h4>POST</h4>
+      <pre>
+        curl -X POST \
+          http://{hostname}/lambda/execute/{functionName} \
+          -H 'Content-Type: application/json' \
+          -d '{
+          "message": "this is a json payload"
+        }'
+      </pre>
+    </div>
+    <div><input type="text" id="addbox" placeholder="new function name"> <button id="addbutton">add</button></div>
+    <input type="text" id="search" onkeyup="tableSearch()" placeholder="Search for function name...">
+    <div>
+      <table id="table" class="table">
+        <thead>
+          <tr>
+            <th width="60%">Function Name</th>
+            <th width="20%">Created At</th>
+            <th width="20%"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% for (var i = 0; i < funcs.length; i++) { %>
+            <tr>
+                <td><%= funcs[i].funcName %></td>
+                <td><%= funcs[i].createdAt %></td>
+                <td><a href="/<%=rootPath %>/funcs/<%= funcs[i].funcName %>">Edit</a></td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+
+  <script>
+    function tableSearch() {
+      // Declare variables 
+      var input, filter, table, tr, td, i, txtValue;
+      input = document.getElementById("search");
+      filter = input.value.toUpperCase();
+      table = document.getElementById("table");
+      tr = table.getElementsByTagName("tr");
+
+      // Loop through all table rows, and hide those who don't match the search query
+      for (i = 0; i < tr.length; i++) {
+        td = tr[i].getElementsByTagName("td")[0];
+        if (td) {
+          txtValue = td.textContent || td.innerText;
+          if (txtValue.toUpperCase().indexOf(filter) > -1) {
+            tr[i].style.display = "";
+          } else {
+            tr[i].style.display = "none";
+          }
+        }
+      }
+    }
+
+    $('#addbutton').on('click', () => {
+      var name = $('#addbox').val().trim().replace(' ', '');
+      if (name.length > 0) {
+        var data = JSON.stringify({
+          'name': name,
+          'function': 'res.json({ \'message\': 1 })'
+        })
+        $.ajax({
+          url: '/<%=rootPath %>/funcs',
+          type: 'POST',
+          contentType: 'application/json',
+          data: data
+        })
+        .done(() => location.reload())
+        .fail((e) => alert(e.responseText))
+      } else {
+        alert(`Function name:${name} is not valid.`)
+      }
+    })
+  </script>
+</body>
+
+</html>

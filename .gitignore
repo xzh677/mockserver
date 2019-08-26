@@ -1,0 +1,15 @@
+*.iml
+.idea/*
+.idea/
+.idea_modules
+.DS_Store
+node_modules
+.idea/vcs.xml
+coverage/
+.nyc_output/
+*.csv
+results/*
+.idea
+.reports/*
+.log/*
+.log/log.tmp

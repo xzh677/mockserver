@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title><%= funcName %></title>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+<style type="text/css" media="screen">
+    :root {
+      --toolbar-size: 20px
+    }
+    #canvas { 
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+    }
+    #toolbar {
+      height: var(--toolbar-size);
+      padding: 5px
+    }
+    #editor {
+      /* Firefox */
+      height: -moz-calc(100% - var(--toolbar-size));
+      /* WebKit */
+      height: -webkit-calc(100% - var(--toolbar-size));
+      /* Opera */
+      height: -o-calc(100% - var(--toolbar-size));
+      /* Standard */
+      height: calc(100% - var(--toolbar-size));
+      margin-top: var(--toolbar-size);
+      width: 100%;
+    }
+</style>
+</head>
+<body>
+
+<div  id="canvas">
+  <div id="toolbar">
+    <div class="float-left">
+        <button id="save">Save</button>
+        <button id="reload">Reload</button>
+        <button id="back">Back To List</button>
+    </div >
+    <div id="message" class="float-right">
+    </div>
+  </div>
+  <div id="editor"></div>
+  <div id="temp" style="display: none"></div>
+</div>
+
+<script src="/js/ace-min-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+<script>
+  var editor = ace.edit("editor");
+  editor.setTheme("ace/theme/monokai");
+  editor.setOptions({
+      fontFamily: "Menlo",
+      fontSize: "14pt"
+  })
+  editor.session.setMode("ace/mode/javascript");
+  
+  var header = `function <%= funcName %>(req, res) {
+/**
+  * Inbound parameter 'req' is an express request
+  * Outbound parameter 'res' is an express response callback
+  * ============================================================================
+  * ========================= DO NOT MODIFY ANYTHING ABOVE =====================
+  * =========================      YOUR CODE IS BELOW      =====================
+  * ============================================================================
+  */
+`;
+
+  var footer = `
+/**
+  * ============================================================================
+  * =========================      YOUR CODE IS ABOVE      =====================
+  * ========================= DO NOT MODIFY ANYTHING BELOW =====================
+  * ============================================================================
+  * You should return a Json object as the output of this function
+  */
+}`;
+
+  $('#temp').text(header + '  ' + `<%= funcBody %>`.trim() + footer);
+  editor.setValue(decodeHTMLEntities($('#temp').text()), 1);
+
+  $('#reload').on('click', () => {
+    location.reload();
+  });
+
+  $('#save').on('click', () => {
+    var data = JSON.stringify({
+      'name': '<%= funcName %>',
+      'function': editor.getValue().replace(header.trim(), '').replace(footer.trim(), '').trim()
+    })
+    $.ajax({
+      url: '/<%=rootPath %>/funcs',
+      type: 'PUT',
+      contentType: 'application/json',
+      data: data
+    }).done(() => {
+      $('#message').html('successfully saved.');
+      setTimeout(() => {
+        $('#message').html('');
+      }, 2000)
+    })
+  });
+
+  $('#back').on('click', () => {
+    window.location.href = "/<%=rootPath %>/"
+  })
+
+  function decodeHTMLEntities(text) {
+    var entities = [
+        ['amp', '&'],
+        ['apos', '\''],
+        ['#x27', '\''],
+        ['#x2F', '/'],
+        ['#39', '\''],
+        ['#47', '/'],
+        ['lt', '<'],
+        ['gt', '>'],
+        ['nbsp', ' '],
+        ['quot', '"']
+    ];
+    for (var i = 0, max = entities.length; i < max; ++i) 
+        text = text.replace(new RegExp('&'+entities[i][0]+';', 'g'), entities[i][1]);
+    return text;
+}
+  
+</script>
+</body>
+</html>
+
