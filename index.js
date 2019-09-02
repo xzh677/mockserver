@@ -38,7 +38,6 @@ app.delete("/log", (req, res) => {
   })
 })
 
-
 app.get("/healthcheck", (req, res) => {
   res.status(200).json({
     "message":"Im healthy!"

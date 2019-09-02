@@ -59,7 +59,7 @@ const funcParamsMiddleware = (req, res, next) => {
 }
 
 const funcNameMiddleware = (req, res, next) => {
-  const funcName = req.params.funcName
+  const funcName = req.params.funcName + req.params[0]
   if (funcName in inMemFunc) {
     req.funcName = funcName
     next()
@@ -157,17 +157,18 @@ const createRouter = (rootPath) => {
   })
   
   // edit function
-  router.get('/funcs/:funcName', funcNameMiddleware, (req, res) => {
+  router.get('/funcs/:funcName*', funcNameMiddleware, (req, res) => {
     const func = inMemFunc[req.funcName]
     res.render(`${rootPath}/editor`, {
       funcName: req.funcName,
+      funcDisplayName: req.funcName.replace(new RegExp('/', 'g'), '_'),
       funcBody: func.function,
       rootPath
     })
   })
 
   // edit delete
-  router.delete('/funcs/:funcName', funcNameMiddleware, (req, res) => {
+  router.delete('/funcs/:funcName*', funcNameMiddleware, (req, res) => {
     const funcName = req.funcName
     const reply = replyHandler(`DELETE /funcs/${funcName}`, res)
     delete inMemFunc[funcName]
@@ -179,15 +180,14 @@ const createRouter = (rootPath) => {
   
   // ===========================================================================
   // execute function
-  const functionExecutePath = '/execute/:funcName'
 
-  router.get(functionExecutePath, funcNameMiddleware, executeFunction("GET"))
+  router.get('/execute/:funcName*', funcNameMiddleware, executeFunction("GET"))
   
-  router.post(functionExecutePath, funcNameMiddleware, executeFunction("POST"))
+  router.post('/execute/:funcName*', funcNameMiddleware, executeFunction("POST"))
 
-  router.put(functionExecutePath, funcNameMiddleware, executeFunction("PUT"))
+  router.put('/execute/:funcName*', funcNameMiddleware, executeFunction("PUT"))
 
-  router.delete(functionExecutePath, funcNameMiddleware, executeFunction("DELETE"))
+  router.delete('/execute/:funcName*', funcNameMiddleware, executeFunction("DELETE"))
 
   return router
 }
