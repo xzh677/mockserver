@@ -161,7 +161,7 @@ const createRouter = (rootPath) => {
     const func = inMemFunc[req.funcName]
     res.render(`${rootPath}/editor`, {
       funcName: req.funcName,
-      funcDisplayName: req.funcName.replace(new RegExp('/', 'g'), '_'),
+      funcDisplayName: req.funcName.replace(new RegExp('/', 'g'), '_').replace(new RegExp('-', 'g'), '_'),
       funcBody: func.function,
       rootPath
     })
