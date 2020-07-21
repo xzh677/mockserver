@@ -1,4 +1,6 @@
 {
-  "echo":  "res.json({\n    'method': req.method,\n    'path': req.path,\n    'headers': req.headers,\n    'query': req.query,\n    'body': req.body\n  })",
+  "txns": "res.json({'ApiResponse':{'ResponseCode':0,'ResponseText':'Success'},'TxnResp':{'ResponseCode':'0','ResponseText':'Accepted','Action':'payment','Amount':1054,'AmountOriginal':1000,'AmountSurcharge':54,'Crn1':req.body.Crn1,'TxnNumber':'1000','ReceiptNumber':'500'}})",
+  "content-assemble": "res.json({'subject': 'this is a title','bodyReferenceUrl': 'http://reference.url/id123','priority':'HIGH','notificationType': 'EMAIL'})",
+  "echo": "res.json({\n    'method': req.method,\n    'path': req.path,\n    'headers': req.headers,\n    'query': req.query,\n    'body': req.body\n  })",
   "error500":"res.status(500).json({\n    'method': req.method,\n    'path': req.path,\n    'headers': req.headers,\n    'query': req.query,\n    'body': req.body\n  })"
 }

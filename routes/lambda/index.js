@@ -79,12 +79,12 @@ const executeFunction = (method) => {
     const funcName = req.funcName
     const reply = replyHandler(`${method} /execute/${funcName}`, res)
     try {
-      inMemFunc[funcName].execute(req, res)
+      setTimeout(() => {inMemFunc[funcName].execute(req, res)
       logger(`${method} /execute/${funcName}`, JSON.stringify({
         'headers': req.headers,
         'query': req.query,
         'body': req.body
-      }, null, 2))
+      }, null, 2))}, 1000)
     } catch (e) {
       reply(500, {
         'message': e.stack.split('\n')
